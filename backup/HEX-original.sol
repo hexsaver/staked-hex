@@ -1,9 +1,8 @@
-// SPDX-License-Identifier: MIT
 /**
  *Submitted for verification at Etherscan.io on 2019-12-03
 */
 
-pragma solidity 0.8.9;
+pragma solidity 0.5.13;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -18,11 +17,11 @@ pragma solidity 0.8.9;
 contract Context {
     // Empty internal constructor, to prevent people from mistakenly deploying
     // an instance of this contract, which should be used via inheritance.
-    constructor () { }
+    constructor () internal { }
     // solhint-disable-previous-line no-empty-blocks
 
     function _msgSender() internal view returns (address payable) {
-        return payable(msg.sender);
+        return msg.sender;
     }
 
     function _msgData() internal view returns (bytes memory) {
@@ -638,7 +637,7 @@ contract GlobalsAndUtility is ERC20 {
     address internal constant ORIGIN_ADDR = 0x9A6a414D6F3497c05E3b1De90520765fA1E07c03;
 
     /* Flush address */
-    address payable internal constant FLUSH_ADDR = payable(0xDEC9f2793e3c17cd26eeFb21C4762fA5128E0399);
+    address payable internal constant FLUSH_ADDR = 0xDEC9f2793e3c17cd26eeFb21C4762fA5128E0399;
 
     /* ERC20 constants */
     string public constant name = "HEX";
@@ -888,7 +887,7 @@ contract GlobalsAndUtility is ERC20 {
      * a single call. Ugly implementation due to limitations of the standard ABI encoder.
      * @param beginDay First day of data range
      * @param endDay Last day (non-inclusive) of data range
-     * @return list Fixed array of packed values
+     * @return Fixed array of packed values
      */
     function dailyDataRange(uint256 beginDay, uint256 endDay)
         external
@@ -1172,7 +1171,7 @@ contract GlobalsAndUtility is ERC20 {
      * @param g Cache of stored globals
      * @param stakeSharesParam Param from stake to calculate bonuses for
      * @param day Day to calculate bonuses for
-     * @return payout Payout in Hearts
+     * @return Payout in Hearts
      */
     function _estimatePayoutRewardsDay(GlobalsCache memory g, uint256 stakeSharesParam, uint256 day)
         internal
@@ -1571,7 +1570,7 @@ contract StakeableToken is GlobalsAndUtility {
      * @param stakeSharesParam Param from stake to calculate bonuses for
      * @param beginDay First day to calculate bonuses for
      * @param endDay Last day (non-inclusive) of range to calculate bonuses for
-     * @return payout Payout in Hearts
+     * @return Payout in Hearts
      */
     function _calcPayoutRewards(
         GlobalsCache memory g,
@@ -2409,7 +2408,7 @@ contract UTXORedeemableToken is UTXOClaimValidation {
      * @param btcAddr Bitcoin address (binary; no base58-check encoding)
      * @param autoStakeDays Number of days to auto-stake, subject to minimum auto-stake days
      * @param referrerAddr Eth address of referring user (optional; 0x0 for no referrer)
-     * @return totalClaimedHearts Total number of Hearts credited, if successful
+     * @return Total number of Hearts credited, if successful
      */
     function _satoshisClaim(
         GlobalsCache memory g,
@@ -2809,7 +2808,7 @@ contract TransformableToken is UTXORedeemableToken {
      * a single call
      * @param beginDay First day of data range
      * @param endDay Last day (non-inclusive) of data range
-     * @return list Fixed array of values
+     * @return Fixed array of values
      */
     function xfLobbyRange(uint256 beginDay, uint256 endDay)
         external
@@ -2837,8 +2836,7 @@ contract TransformableToken is UTXORedeemableToken {
      * Only needed due to limitations of the standard ABI encoder.
      * @param memberAddr Eth address of the lobby member
      * @param entryId 49 bit compound value. Top 9 bits: enterDay, Bottom 40 bits: entryIndex
-     * @return rawAmount Raw amount that was entered with;
-     * @return referrerAddr Referring Eth addr (optional; 0x0 for no referrer)
+     * @return 1: Raw amount that was entered with; 2: Referring Eth addr (optional; 0x0 for no referrer)
      */
     function xfLobbyEntry(address memberAddr, uint256 entryId)
         external
@@ -2858,7 +2856,7 @@ contract TransformableToken is UTXORedeemableToken {
     /**
      * @dev PUBLIC FACING: Return the lobby days that a user is in with a single call
      * @param memberAddr Eth address of the user
-     * @return words Bit vector of lobby day numbers
+     * @return Bit vector of lobby day numbers
      */
     function xfLobbyPendingDays(address memberAddr)
         external
@@ -2938,6 +2936,7 @@ contract TransformableToken is UTXORedeemableToken {
 
 contract HEX is TransformableToken {
     constructor()
+        public
     {
         /* Initialize global shareRate to 1 */
         globals.shareRate = uint40(1 * SHARE_RATE_SCALE);
@@ -2953,5 +2952,5 @@ contract HEX is TransformableToken {
         );
     }
 
-    receive() external payable {}
+    function() external payable {}
 }
